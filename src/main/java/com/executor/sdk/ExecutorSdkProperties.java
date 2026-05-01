@@ -14,6 +14,12 @@ public class ExecutorSdkProperties {
     /** Producer Group，默认 executorProduceGroup */
     private String group = "executorProduceGroup";
 
+    /** RocketMQ ACL AccessKey（可选） */
+    private String accessKey;
+
+    /** RocketMQ ACL SecretKey（可选） */
+    private String secretKey;
+
     public String getNameserver() { return nameserver; }
     public void setNameserver(String nameserver) { this.nameserver = nameserver; }
 
@@ -22,4 +28,10 @@ public class ExecutorSdkProperties {
 
     public String getGroup() { return group; }
     public void setGroup(String group) { this.group = group; }
+
+    public String getAccessKey() { return accessKey; }
+    public void setAccessKey(String accessKey) { this.accessKey = accessKey; }
+
+    public String getSecretKey() { return secretKey; }
+    public void setSecretKey(String secretKey) { this.secretKey = secretKey; }
 }

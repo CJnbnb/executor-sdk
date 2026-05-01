@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.executor.sdk.builder.TaskBuilder;
 import com.executor.sdk.exception.ExecutorSdkException;
 import com.executor.sdk.model.TaskRequest;
+import org.apache.rocketmq.acl.common.AclClientRPCHook;
+import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -30,10 +32,20 @@ public class ExecutorSdkClient {
 
     @PostConstruct
     public void init() throws MQClientException {
-        producer = new DefaultMQProducer(properties.getGroup());
+        String ak = properties.getAccessKey();
+        String sk = properties.getSecretKey();
+        if (ak != null && !ak.isBlank() && sk != null && !sk.isBlank()) {
+            AclClientRPCHook aclHook = new AclClientRPCHook(new SessionCredentials(ak, sk));
+            producer = new DefaultMQProducer(properties.getGroup(), aclHook);
+            log.info("ExecutorSdkClient started with ACL, nameserver={}, group={}, accessKey={}",
+                    properties.getNameserver(), properties.getGroup(), ak);
+        } else {
+            producer = new DefaultMQProducer(properties.getGroup());
+            log.info("ExecutorSdkClient started (no ACL), nameserver={}, group={}",
+                    properties.getNameserver(), properties.getGroup());
+        }
         producer.setNamesrvAddr(properties.getNameserver());
         producer.start();
-        log.info("ExecutorSdkClient started, nameserver={}, group={}", properties.getNameserver(), properties.getGroup());
     }
 
     @PreDestroy
